@@ -34,21 +34,31 @@ const router = Router();
  *           schema:
  *             type: object
  *             properties:
- *               nombre:
+ *               name:
  *                 type: string
- *                 example: Plan Premium
- *               velocidad:
- *                 type: string
- *                 example: 100 Mbps
- *               precio:
+ *                 example: Plan Super 100
+ *               downloadSpeed:
+ *                 type: number
+ *                 example: 100
+ *               uploadSpeed:
+ *                 type: number
+ *                 example: 20
+ *               price:
  *                 type: number
  *                 example: 120
+ *               pppoeProfile:
+ *                 type: string
+ *                 example: profile_100mb
+ *               description:
+ *                 type: string
+ *                 example: Plan ideal para hogares con múltiples dispositivos
  *     responses:
  *       201:
  *         description: Plan creado exitosamente
  */
 router.get('/', obtenerPlanes);
 router.post('/', crearPlan);
+
 
 /**
  * @swagger
@@ -70,15 +80,24 @@ router.post('/', crearPlan);
  *           schema:
  *             type: object
  *             properties:
- *               nombre:
+ *               name:
  *                 type: string
- *                 example: Plan Gold
- *               velocidad:
- *                 type: string
- *                 example: 200 Mbps
- *               precio:
+ *                 example: Plan Gold 200
+ *               downloadSpeed:
  *                 type: number
  *                 example: 200
+ *               uploadSpeed:
+ *                 type: number
+ *                 example: 30
+ *               price:
+ *                 type: number
+ *                 example: 200
+ *               pppoeProfile:
+ *                 type: string
+ *                 example: profile_200mb
+ *               description:
+ *                 type: string
+ *                 example: Plan para clientes exigentes
  *     responses:
  *       200:
  *         description: Plan actualizado exitosamente
@@ -98,5 +117,6 @@ router.post('/', crearPlan);
  */
 router.put('/:id', actualizarPlan);
 router.delete('/:id', eliminarPlan);
+
 
 export default router;

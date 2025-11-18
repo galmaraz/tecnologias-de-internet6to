@@ -8,7 +8,7 @@ const ClienteSchema = new Schema<IClient & Document>({
   email: { type: String, required: true, unique: true },
   direccion: { type: String, required: true },
   fechaRegistro: { type: Date, default: Date.now },
-  estado: { type: String, enum: ['activo', 'inactivo'], default: 'activo' },
+  estado: { type: String, enum: ['activo', 'inactivo', 'suspendido'], default: 'activo' },
 });
 
 export default model<IClient & Document>('Cliente', ClienteSchema);

@@ -1,20 +1,33 @@
-import mongoose, { Schema } from 'mongoose';
+// src/models/contract.model.ts
+import mongoose, { Schema, Document, Model } from 'mongoose';
 import { IContract } from '../interfaces/IContract';
 import crypto from 'crypto';
 
-const ContractSchema: Schema<IContract> = new Schema({
-  clienteId: { type: Schema.Types.ObjectId, ref: 'Cliente', required: true },
+// Extendemos Document para incluir IContract y campos extra (PPPoE)
+export interface IContractDocument extends IContract, Document {
+  usuarioPPPoE: string;
+  contrasenaPPPoE: string;
+}
+
+// Creamos el Schema SIN tipar con IContract
+const ContractSchema = new Schema({
+  clientId: { type: Schema.Types.ObjectId, ref: 'Cliente', required: true },
   planId: { type: Schema.Types.ObjectId, ref: 'Plan', required: true },
-  servidor: { type: String, required: true },
+  routerId: { type: Schema.Types.ObjectId, ref: 'Router', required: false },
+
   usuarioPPPoE: { type: String, required: true, unique: true },
   contrasenaPPPoE: { type: String, required: true },
+
+  estado: { type: String, enum: ['active', 'suspended', 'cancelled'], default: 'active' },
+
   fechaInicio: { type: Date, default: Date.now },
   fechaFin: { type: Date, default: null },
-  estado: { type: String, enum: ['activo', 'suspendido', 'finalizado'], default: 'activo' },
+
+  monthlyFee: { type: Number, required: true }
 }, { timestamps: true });
 
-// Middleware para generar usuario y contraseña antes de guardar
-ContractSchema.pre('validate', function(next) {
+// Middleware para generar PPPoE automáticamente
+ContractSchema.pre<IContractDocument>('validate', function(next) {
   if (!this.usuarioPPPoE) {
     this.usuarioPPPoE = 'user' + crypto.randomBytes(3).toString('hex');
   }
@@ -24,4 +37,6 @@ ContractSchema.pre('validate', function(next) {
   next();
 });
 
-export default mongoose.model<IContract>('Contract', ContractSchema);
+// Exportamos el modelo tipado
+const Contract: Model<IContractDocument> = mongoose.model<IContractDocument>('Contract', ContractSchema);
+export default Contract;

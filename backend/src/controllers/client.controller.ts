@@ -3,7 +3,7 @@ import Cliente from '../models/client.model';
 import { IClient } from '../interfaces/IClient';
 
 /**
- * 📘 Crear un nuevo cliente
+ * 📕 Crear cliente
  */
 export const crearCliente = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -12,7 +12,16 @@ export const crearCliente = async (req: Request, res: Response): Promise<void> =
 
     res.status(201).json({
       mensaje: '✅ Cliente creado exitosamente',
-      data: clienteGuardado,
+      data: {
+        id: clienteGuardado._id,
+        name: clienteGuardado.nombre,
+        ci: clienteGuardado.ci,
+        telefono: clienteGuardado.telefono,
+        email: clienteGuardado.email,
+        direccion: clienteGuardado.direccion,
+        status: clienteGuardado.estado || 'activo',
+        fechaRegistro: clienteGuardado.fechaRegistro,
+      },
     });
   } catch (error: any) {
     res.status(400).json({
@@ -33,7 +42,6 @@ export const obtenerClientes = async (req: Request, res: Response): Promise<void
     if (ci) filtro.ci = ci;
     if (nombre) filtro.nombre = { $regex: nombre, $options: 'i' };
 
-    // Aseguramos que "estado" se incluya
     const clientes = await Cliente.find(filtro, {
       nombre: 1,
       ci: 1,
@@ -46,7 +54,16 @@ export const obtenerClientes = async (req: Request, res: Response): Promise<void
 
     res.status(200).json({
       total: clientes.length,
-      data: clientes,
+      data: clientes.map(c => ({
+        id: c._id,
+        name: c.nombre,
+        ci: c.ci,
+        telefono: c.telefono,
+        email: c.email,
+        direccion: c.direccion,
+        status: c.estado || 'activo',
+        fechaRegistro: c.fechaRegistro,
+      })),
     });
   } catch (error: any) {
     res.status(500).json({
@@ -69,7 +86,18 @@ export const obtenerClientePorId = async (req: Request, res: Response): Promise<
       return;
     }
 
-    res.status(200).json({ data: cliente });
+    res.status(200).json({
+      data: {
+        id: cliente._id,
+        name: cliente.nombre,
+        ci: cliente.ci,
+        telefono: cliente.telefono,
+        email: cliente.email,
+        direccion: cliente.direccion,
+        status: cliente.estado || 'activo',
+        fechaRegistro: cliente.fechaRegistro,
+      },
+    });
   } catch (error: any) {
     res.status(500).json({
       mensaje: '❌ Error al obtener cliente',
@@ -97,7 +125,16 @@ export const actualizarCliente = async (req: Request, res: Response): Promise<vo
 
     res.status(200).json({
       mensaje: '✅ Cliente actualizado correctamente',
-      data: clienteActualizado,
+      data: {
+        id: clienteActualizado._id,
+        name: clienteActualizado.nombre,
+        ci: clienteActualizado.ci,
+        telefono: clienteActualizado.telefono,
+        email: clienteActualizado.email,
+        direccion: clienteActualizado.direccion,
+        status: clienteActualizado.estado || 'activo',
+        fechaRegistro: clienteActualizado.fechaRegistro,
+      },
     });
   } catch (error: any) {
     res.status(400).json({
@@ -122,7 +159,16 @@ export const eliminarCliente = async (req: Request, res: Response): Promise<void
 
     res.status(200).json({
       mensaje: '🗑️ Cliente eliminado correctamente',
-      data: clienteEliminado,
+      data: {
+        id: clienteEliminado._id,
+        name: clienteEliminado.nombre,
+        ci: clienteEliminado.ci,
+        telefono: clienteEliminado.telefono,
+        email: clienteEliminado.email,
+        direccion: clienteEliminado.direccion,
+        status: clienteEliminado.estado || 'activo',
+        fechaRegistro: clienteEliminado.fechaRegistro,
+      },
     });
   } catch (error: any) {
     res.status(500).json({
