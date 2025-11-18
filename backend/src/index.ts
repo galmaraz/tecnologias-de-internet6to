@@ -8,6 +8,10 @@ import planRoutes from './routes/plan.routes';
 import contratoRoutes from './routes/contract.routes'; 
 import serverRoutes from './routes/server.routes';
 import monitorRoutes from './routes/monitor.routes';
+import routerRoutes from './routes/router.routes'
+import connectionsRoutes from "./routes/connections.routes";
+import alert from "./routes/alert.routes"
+
 
 dotenv.config();
 connectDB();
@@ -30,6 +34,12 @@ app.use('/api/planes', planRoutes);
 app.use('/api/contratos', contratoRoutes);
 app.use('/api/servers', serverRoutes);
 app.use('/api/dashboard', monitorRoutes);
+app.use('/api/routers', routerRoutes);
+app.use("/api/connections", connectionsRoutes)
+app.use("/api/dashboard", alert)
+
+
+
 
 swaggerDocs(app, Number(PORT));
 

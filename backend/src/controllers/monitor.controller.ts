@@ -1,44 +1,47 @@
 import { Request, Response } from 'express';
-import Cliente from '../models/client.model';
+import Client from '../models/client.model';
 import Server from '../models/server.model';
+import Contract from '../models/contract.model'; // Asumimos que tienes un modelo de contratos
 
 /**
- * 📊 Obtener indicadores principales (KPIs) del sistema
+ * Obtener estadísticas generales del dashboard (DashboardStats)
  */
-export const obtenerIndicadoresDashboard = async (req: Request, res: Response): Promise<void> => {
+export const getDashboardStats = async (req: Request, res: Response) => {
   try {
-    // Contar clientes activos e inactivos
-    const clientesActivos = await Cliente.countDocuments({ estado: 'activo' });
-    const clientesInactivos = await Cliente.countDocuments({ estado: 'inactivo' });
+    // Clientes
+    const totalClients = await Client.countDocuments();
+    const activeClients = await Client.countDocuments({ estado: 'activo' });
+    const suspendedClients = await Client.countDocuments({ estado: 'suspendido' });
+    const inactiveClients = await Client.countDocuments({ estado: 'inactivo' });
 
-    // Contar routers online/offline
-    const routersOnline = await Server.countDocuments({ estado: 'online' });
-    const routersOffline = await Server.countDocuments({ estado: 'offline' });
+    // Routers
+    const totalRouters = await Server.countDocuments();
+    const onlineRouters = await Server.countDocuments({ estado: 'online' });
+    const offlineRouters = await Server.countDocuments({ estado: 'offline' });
 
-    // Calcular promedios de CPU y ancho de banda
-    const servidores = await Server.find({}, { cpu: 1, trafico: 1 });
-    const cpuUsage =
-      servidores.length > 0
-        ? servidores.reduce((acc, s) => acc + (s.cpu || 0), 0) / servidores.length
-        : 0;
-    const bandwidthUsage =
-      servidores.length > 0
-        ? servidores.reduce((acc, s) => acc + (s.trafico || 0), 0) / servidores.length
-        : 0;
+    // Contratos
+    const totalContracts = await Contract.countDocuments();
+    const activeContracts = await Contract.countDocuments({ estado: 'active' });
 
-    // Respuesta final
+    // Ingresos mensuales (sumatoria de monthlyFee de contratos activos)
+    const contractsActive = await Contract.find({ estado: 'active' }, { monthlyFee: 1 });
+    const monthlyRevenue = contractsActive.reduce((sum, c) => sum + (c.monthlyFee || 0), 0);
+
+    // Respuesta compatible con frontend
     res.status(200).json({
-      clientesActivos,
-      clientesInactivos,
-      routersOnline,
-      routersOffline,
-      cpuUsage: Number(cpuUsage.toFixed(2)),
-      bandwidthUsage: Number(bandwidthUsage.toFixed(2)),
+      totalClients,
+      activeClients,
+      suspendedClients,
+      inactiveClients,
+      totalRouters,
+      onlineRouters,
+      offlineRouters,
+      monthlyRevenue,
+      totalContracts,
+      activeContracts,
     });
   } catch (error: any) {
-    res.status(500).json({
-      mensaje: '❌ Error al obtener indicadores del dashboard',
-      error: error.message,
-    });
+    console.error('Error obteniendo estadísticas del dashboard:', error);
+    res.status(500).json({ message: 'Error obteniendo estadísticas del dashboard', error: error.message });
   }
 };

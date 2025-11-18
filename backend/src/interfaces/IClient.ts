@@ -6,5 +6,5 @@ export interface IClient {
   email: string;
   direccion: string;
   fechaRegistro?: Date;
-  estado?: 'activo' | 'inactivo'; 
+  estado?: 'activo' | 'inactivo' | 'suspendido'; 
 }

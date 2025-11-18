@@ -1,22 +1,17 @@
 // src/models/plan.model.ts
 import { Schema, model } from 'mongoose';
+import { IPlan } from '../interfaces/IPlan';
 
-interface IPlan {
-  nombre: string;          // Nombre del plan
-  velocidad: string;       // Ej: "100 Mbps"
-  descripcion: string;     // Detalles del plan
-  estado: boolean;         // Activo / Inactivo
-  profileMikrotik: string; // Nombre del profile en MikroTik
-}
 
 const planSchema = new Schema<IPlan>({
-  nombre: { type: String, required: true, unique: true },
-  velocidad: { type: String, required: true },
-  descripcion: { type: String },
-  estado: { type: Boolean, default: true },
-  profileMikrotik: { type: String, required: true }
+  name: { type: String, required: true, unique: true },
+  downloadSpeed: { type: Number, required: true },
+  uploadSpeed: { type: Number, required: true },
+  price: { type: Number, required: true },
+  pppoeProfile: { type: String, required: true },
+  description: { type: String }
 }, {
-  timestamps: true
+  timestamps: true   //  agrega createdAt y updatedAt automáticamente
 });
 
 export default model<IPlan>('Plan', planSchema);

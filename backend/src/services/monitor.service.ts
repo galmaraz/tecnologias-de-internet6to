@@ -1,16 +1,36 @@
 import Client from '../models/client.model';
 import Server from '../models/server.model';
-import { IClient } from '../interfaces/IClient';
-import { IServer } from '../interfaces/IServer';
+import Contract from '../models/contract.model';
+import { DashboardStats } from '../interfaces/IdashboardStats';
 
-export const obtenerEstadoClientes = async (): Promise<IClient[]> => {
-  return Client.find({}, { nombre: 1, ci: 1, estado: 1 }).exec();
-};
+export class DashboardStatsService {
+  async getDashboardStats(): Promise<DashboardStats> {
+    const totalClients = await Client.countDocuments();
+    const activeClients = await Client.countDocuments({ estado: 'activo' });
+    const suspendedClients = await Client.countDocuments({ estado: 'suspendido' });
+    const inactiveClients = await Client.countDocuments({ estado: 'inactivo' });
 
-export const obtenerClienteDetalle = async (id: string): Promise<IClient | null> => {
-  return Client.findById(id).exec();
-};
+    const totalRouters = await Server.countDocuments();
+    const onlineRouters = await Server.countDocuments({ estado: 'online' });
+    const offlineRouters = await Server.countDocuments({ estado: 'offline' });
 
-export const obtenerEstadoServidores = async (): Promise<IServer[]> => {
-  return Server.find({}, { nombre: 1, ip: 1, estado: 1, cpu: 1, trafico: 1, uptime: 1 }).exec();
-};
+    const totalContracts = await Contract.countDocuments();
+    const activeContracts = await Contract.countDocuments({ estado: 'active' });
+
+    const contractsActive = await Contract.find({ estado: 'active' }, { monthlyFee: 1 });
+    const monthlyRevenue = contractsActive.reduce((sum, c) => sum + (c.monthlyFee || 0), 0);
+
+    return {
+      totalClients,
+      activeClients,
+      suspendedClients,
+      inactiveClients,
+      totalRouters,
+      onlineRouters,
+      offlineRouters,
+      monthlyRevenue,
+      totalContracts,
+      activeContracts,
+    };
+  }
+}
